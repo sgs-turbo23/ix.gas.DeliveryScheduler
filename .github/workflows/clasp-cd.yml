@@ -21,7 +21,7 @@ jobs:
           echo //npm.pkg.github.com/:_authToken=\"${{ secrets.NPM_TOKEN }}\" >> ~/.npmrc
       - name: Install Clasp
         run: |
-          npm config set @sgs-turbo23/ix.js.datetime_extension https://npm.pkg.github.com/sgs-turbo23
+          npm config set sgs-turbo23/ix.js.datetime_extension https://npm.pkg.github.com/sgs-turbo23
           npm init -y
           npm install clasp -g
           npm install
