@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@sgs-turbo23/ix.js.datetime_extension": "^1.0.1"
+  }
+}
