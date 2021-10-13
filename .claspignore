@@ -1,5 +1,5 @@
 **/**
-!./node_modules/@sgs-turbo23/ix.js.datetime_extension/dist/datetimeUtil.js
+!datetimeUtil.js
 !appsscript.json
 !main.js
 !slackWrapper.js
