@@ -1,8 +1,8 @@
 class secret {
     static getSlackId() {
-      return $SLACK_URL;
+      return "?SLACK_URL";
     }
     static getCalendarId() {
-      return $CALENDAR_ID;
+      return "?CALENDAR_ID";
     }
 }
