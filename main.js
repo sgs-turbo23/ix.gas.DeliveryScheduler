@@ -1,7 +1,7 @@
 let slack;
 
 function main() {
-  slack = new slackWrapper(secretConst.SLACK_URL, 'Delivery Schedule');
+  slack = new slackNotifier(secret.getSlackId, 'Delivery Schedule');
   try {
     const yesterday = datetimeUtil.getYesterday(new Date());
     // ヨドバシカメラからの配達予定
@@ -20,13 +20,13 @@ function getMessages(query) {
 }
 
 function registerEvent(title, starttime, endtime, description) {
-  var calender = CalendarApp.getCalendarById(secretConst.CALENDAR_ID);
+  var calender = CalendarApp.getCalendarById(secret.getCalendarId);
   var event = calender.createEvent(title, new Date(starttime), new Date(endtime), {description: description});
   event.setColor('4');
 }
 
 function registerDayEvent(title, date, description) {
-  var calender = CalendarApp.getCalendarById(secretConst.CALENDAR_ID);
+  var calender = CalendarApp.getCalendarById(secret.getCalendarId);
   var event = calender.createAllDayEvent(title, new Date(date), {description: description});
   event.setColor('4');
 }

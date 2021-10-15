@@ -1,5 +1,8 @@
-"use strict";
 class secret {
-    static SLACK_URL = $SLACK_URL;
-    static CALENDAR_ID = $CALENDAR_ID;
+    static getSlackId() {
+      return $SLACK_URL;
+    }
+    static getCalendarId() {
+      return $CALENDAR_ID;
+    }
 }
