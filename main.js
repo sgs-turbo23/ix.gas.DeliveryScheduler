@@ -1,16 +1,46 @@
 let slack;
 
 function main() {
-  slack = new slackNotifier(secret.getSlackId, 'Delivery Schedule');
+  slack = new slackNotifier(secret.getSlackId(), 'Delivery Schedule');
   try {
     const yesterday = datetimeUtil.getYesterday(new Date());
     // ヨドバシカメラからの配達予定
     setYodobashiDeliverySchedule(yesterday);
     // Amazonからの配達予定
     setAmazonDeliverySchedule(yesterday);
+    // 楽天西友ネットスーパーからの配達予定
+    setRakutenDeliverySchedule(yesterday);
   } catch (error) {
     console.log(error);
     slack.postToSlack(`エラーが発生しました。\n${error}`);
+  }
+}
+
+function setRakutenDeliverySchedule(date) {
+  // 前日のメールを取得
+  const query = `from:order@mail.sm.rakuten.co.jp after:${datetimeUtil.makeDateString(date)}`;
+  // メールの構造はthreads > messsages > thread > messageの構造
+  for(const thread of getMessages(query)){
+    for(const message of thread){
+      const body = message.getBody();
+      // ・お届け日時：2021年10月17日(日) 20:00～22:00
+      const lines = body.split(/\r\n|\n/).filter(v => v.match(".*・お届け日時：.*"));
+
+      lines.forEach(l => {
+        const line = l.trim().replace('・お届け日時：', '').replace('<br>', '');
+
+        const dt = line.split(' ');
+        // 文字列;　　配達希望日：2021年09月05日　08：00～12：00
+        // 年月日と時間を抽出する
+        const date = dt[0].replace('年', '/').replace('月', '/').replace('日', '').substring(0, 10);
+        const time = dt[1].split('：').join(':').split('～');
+        registerEvent('楽天西友ネットスーパーからの配達'
+          , `${date} ${time[0]}`
+          , `${date} ${time[1]}`
+          , 'https://mail.google.com/mail/u/0/#all/' + message.getId());
+      });
+      slack.postToSlack(`<@ma.iw>楽天西友ネットスーパーからの配達予定をGoogle Calendarに保存しました\nhttps://mail.google.com/mail/u/0/#all/` + message.getId());
+    }
   }
 }
 
@@ -20,13 +50,13 @@ function getMessages(query) {
 }
 
 function registerEvent(title, starttime, endtime, description) {
-  var calender = CalendarApp.getCalendarById(secret.getCalendarId);
+  var calender = CalendarApp.getCalendarById(secret.getCalendarId());
   var event = calender.createEvent(title, new Date(starttime), new Date(endtime), {description: description});
   event.setColor('4');
 }
 
 function registerDayEvent(title, date, description) {
-  var calender = CalendarApp.getCalendarById(secret.getCalendarId);
+  var calender = CalendarApp.getCalendarById(secret.getCalendarId());
   var event = calender.createAllDayEvent(title, new Date(date), {description: description});
   event.setColor('4');
 }
@@ -37,7 +67,6 @@ function setAmazonDeliverySchedule(date) {
   // メールの構造はthreads > messsages > thread > messageの構造
   for(const thread of getMessages(query)){
     for(const message of thread){
-      // Attachment（添付ファイルを取得）
       const body = message.getBody();
       
       let lines = Parser.data(body)
@@ -83,7 +112,6 @@ function setYodobashiDeliverySchedule(date) {
   // メールの構造はthreads > messsages > thread > messageの構造
   for(const thread of getMessages(query)){
     for(const message of thread){
-      // Attachment（添付ファイルを取得）
       const body = message.getBody();
       const lines = body.split(/\r\n|\n/).filter(v => v.match(".*配達希望日：.*"));
 
