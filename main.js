@@ -3,22 +3,23 @@ let slack;
 function main() {
   slack = new slackNotifier(secret.getSlackId(), 'Delivery Schedule');
   try {
-    const yesterday = datetimeUtil.getYesterday(new Date());
+    const yesterday = datetimeUtil.getYesterday(datetimeUtil.getToday());
+    const epoch = Math.floor(yesterday.getTime() / 1000);
     // ヨドバシカメラからの配達予定
-    setYodobashiDeliverySchedule(yesterday);
+    setYodobashiDeliverySchedule(epoch);
     // Amazonからの配達予定
-    setAmazonDeliverySchedule(yesterday);
+    setAmazonDeliverySchedule(epoch);
     // 楽天西友ネットスーパーからの配達予定
-    setRakutenDeliverySchedule(yesterday);
+    setRakutenDeliverySchedule(epoch);
   } catch (error) {
     console.log(error);
     slack.postToSlack(`エラーが発生しました。\n${error}`);
   }
 }
 
-function setRakutenDeliverySchedule(date) {
+function setRakutenDeliverySchedule(epoch) {
   // 前日のメールを取得
-  const query = `from:order@mail.sm.rakuten.co.jp after:${datetimeUtil.makeDateString(date)}`;
+  const query = `from:order@mail.sm.rakuten.co.jp after:${epoch}`;
   // メールの構造はthreads > messsages > thread > messageの構造
   for(const thread of getMessages(query)){
     for(const message of thread){
@@ -61,9 +62,9 @@ function registerDayEvent(title, date, description) {
   event.setColor('4');
 }
 
-function setAmazonDeliverySchedule(date) {
+function setAmazonDeliverySchedule(epoch) {
   // 前日のメールを取得
-  const query = `from:auto-confirm@amazon.co.jp after:${datetimeUtil.makeDateString(date)}`;
+  const query = `from:auto-confirm@amazon.co.jp after:${epoch}`;
   // メールの構造はthreads > messsages > thread > messageの構造
   for(const thread of getMessages(query)){
     for(const message of thread){
@@ -104,11 +105,11 @@ function adjustYear(dateWithoutYear, baseDate) {
   }
 }
 
-function setYodobashiDeliverySchedule(date) {
+function setYodobashiDeliverySchedule(epoch) {
   let schedule = [];
 
   // 前日のメールを取得
-  const query = `from:thanks_gochuumon@yodobashi.com after:${datetimeUtil.makeDateString(date)}`;
+  const query = `from:thanks_gochuumon@yodobashi.com after:${epoch}`;
   // メールの構造はthreads > messsages > thread > messageの構造
   for(const thread of getMessages(query)){
     for(const message of thread){
