@@ -82,13 +82,13 @@ function setAmazonDeliverySchedule(epoch) {
         const matchreg = [...l.matchAll(/[0-9]{2}\/[0-9]{2} [0-9]{2}:[0-9]{2}/g)];
         if (matchreg.length > 1) {
           matchreg.forEach(m => {
-            result.push(adjustYear(m[0], date));
+            result.push(adjustYear(m[0], datetimeUtil.getYesterday(datetimeUtil.getToday())));
           });
 
           registerEvent('Amazonからの配達', result[0], result[1], 'https://mail.google.com/mail/u/0/#all/' + message.getId());
         } else {
           let match = l.match(/[0-9]{2}\/[0-9]{2} /g);
-          let day = adjustYear(match[0].trim(), date);
+          let day = adjustYear(match[0].trim(), datetimeUtil.getYesterday(datetimeUtil.getToday()));
           registerDayEvent('Amazonからの配達', day, 'https://mail.google.com/mail/u/0/#all/' + message.getId());
         }
       });
