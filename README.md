@@ -1,3 +1,5 @@
+# 本プロジェクトはGASの認証方法変更に伴い、廃止しました
+
 # ix.gas.DeliveryScheduler
 Google App Scriptを使用し配達予定をGoogle Calendarに登録します
 

@@ -108,3 +108,4 @@ dist
 secretConst.js
 secret
 release/
+creds.json
