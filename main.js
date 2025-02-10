@@ -9,18 +9,18 @@ function main() {
     setYodobashiDeliverySchedule(epoch);
     // Amazonからの配達予定
     setAmazonDeliverySchedule(epoch);
-    // 楽天西友ネットスーパーからの配達予定
-    setRakutenDeliverySchedule(epoch);
+    // 西友ネットスーパーからの配達予定
+    setSeiyuDeliverySchedule(epoch);
   } catch (error) {
     console.log(error);
     slack.postToSlack(`エラーが発生しました。\n${error}`);
   }
 }
 
-function setRakutenDeliverySchedule(epoch) {
+function setSeiyuDeliverySchedule(epoch) {
   // 前日のメールを取得
-  const query = `from:order@mail.sm.rakuten.co.jp after:${epoch}`;
-  // メールの構造はthreads > messsages > thread > messageの構造
+  const query = `from:order@mail.netsuper.rakuten.co.jp after:${epoch}`;
+  // メールの構造はthreads > messages > thread > messageの構造
   for(const thread of getMessages(query)){
     for(const message of thread){
       const body = message.getBody();
@@ -35,12 +35,12 @@ function setRakutenDeliverySchedule(epoch) {
         // 年月日と時間を抽出する
         const date = dt[0].replace('年', '/').replace('月', '/').replace('日', '').substring(0, 10);
         const time = dt[1].split('：').join(':').split('～');
-        registerEvent('楽天西友ネットスーパーからの配達'
+        registerEvent('西友ネットスーパーからの配達'
           , `${date} ${time[0]}`
           , `${date} ${time[1]}`
           , 'https://mail.google.com/mail/u/0/#all/' + message.getId());
       });
-      slack.postToSlack(`<@ma.iw>楽天西友ネットスーパーからの配達予定をGoogle Calendarに保存しました\nhttps://mail.google.com/mail/u/0/#all/` + message.getId());
+      slack.postToSlack(`<@ma.iw>西友ネットスーパーからの配達予定をGoogle Calendarに保存しました\nhttps://mail.google.com/mail/u/0/#all/` + message.getId());
     }
   }
 }
